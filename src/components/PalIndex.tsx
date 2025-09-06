@@ -57,32 +57,44 @@ const PalIndex = () => {
         </div>
 
         <div className="gaming-card p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">{selectedPal.name}</h2>
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getElementColor(selectedPal.element)}`}>
-                  {selectedPal.element}
-                </span>
-                <span className={`font-medium ${getRarityColor(selectedPal.rarity)}`}>
-                  {selectedPal.rarity}
-                </span>
-              </div>
+          <div className="flex items-start gap-6 mb-4">
+            <div className="flex-shrink-0">
+              <img 
+                src={selectedPal.imageUrl} 
+                alt={selectedPal.name}
+                className="w-24 h-24 rounded-lg object-cover bg-muted"
+              />
             </div>
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  size={16} 
-                  className={i < selectedPal.breedingLevel ? 'text-accent fill-accent' : 'text-muted-foreground'} 
-                />
-              ))}
+            <div className="flex-grow">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-3xl font-bold text-foreground mb-2">{selectedPal.name}</h2>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm text-muted-foreground">#{selectedPal.number}</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getElementColor(selectedPal.element)}`}>
+                      {selectedPal.element}
+                    </span>
+                    <span className={`font-medium ${getRarityColor(selectedPal.rarity)}`}>
+                      {selectedPal.rarity}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      size={16} 
+                      className={i < selectedPal.breedingLevel ? 'text-accent fill-accent' : 'text-muted-foreground'} 
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
           <p className="text-muted-foreground mb-6">{selectedPal.description}</p>
 
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div>
               <h3 className="font-semibold text-foreground mb-3">Stats</h3>
               <div className="space-y-2">
@@ -93,7 +105,7 @@ const PalIndex = () => {
                       <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-primary rounded-full transition-all duration-500"
-                          style={{ width: `${(value / 100) * 100}%` }}
+                          style={{ width: `${(value / 150) * 100}%` }}
                         />
                       </div>
                       <span className="text-foreground font-medium w-8 text-right">{value}</span>
@@ -107,6 +119,10 @@ const PalIndex = () => {
               <h3 className="font-semibold text-foreground mb-3">Info</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">Paldeck #</span>
+                  <span className="text-foreground">{selectedPal.number}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Habitat</span>
                   <span className="text-foreground">{selectedPal.habitat}</span>
                 </div>
@@ -114,9 +130,36 @@ const PalIndex = () => {
                   <span className="text-muted-foreground">Breeding Level</span>
                   <span className="text-foreground">{selectedPal.breedingLevel}</span>
                 </div>
+                {selectedPal.partner && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Partner Skill</span>
+                    <span className="text-accent">Available</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
+
+          {selectedPal.workSuitability && Object.keys(selectedPal.workSuitability).length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-foreground mb-3">Work Suitability</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {Object.entries(selectedPal.workSuitability).map(([work, level]) => (
+                  <div key={work} className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded-lg">
+                    <span className="capitalize text-sm text-muted-foreground">{work}</span>
+                    <div className="flex items-center gap-1">
+                      {[...Array(4)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`w-2 h-2 rounded-full ${i < level ? 'bg-primary' : 'bg-muted'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <h3 className="font-semibold text-foreground mb-3">Skills</h3>
@@ -202,30 +245,42 @@ const PalIndex = () => {
           <button
             key={pal.id}
             onClick={() => setSelectedPal(pal)}
-            className="gaming-card p-4 text-left"
+            className="gaming-card p-4 text-left hover:bg-muted/50 transition-colors"
           >
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                {pal.name}
-              </h3>
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    size={12} 
-                    className={i < pal.breedingLevel ? 'text-accent fill-accent' : 'text-muted-foreground'} 
-                  />
-                ))}
+            <div className="flex items-start gap-3 mb-3">
+              <img 
+                src={pal.imageUrl} 
+                alt={pal.name}
+                className="w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0"
+              />
+              <div className="flex-grow">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {pal.name}
+                    </h3>
+                    <span className="text-xs text-muted-foreground">#{pal.number}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={12} 
+                        className={i < pal.breedingLevel ? 'text-accent fill-accent' : 'text-muted-foreground'} 
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${getElementColor(pal.element)}`}>
+                    {pal.element}
+                  </span>
+                  <span className={`text-sm font-medium ${getRarityColor(pal.rarity)}`}>
+                    {pal.rarity}
+                  </span>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-2 mb-3">
-              <span className={`px-2 py-1 rounded text-xs font-medium ${getElementColor(pal.element)}`}>
-                {pal.element}
-              </span>
-              <span className={`text-sm font-medium ${getRarityColor(pal.rarity)}`}>
-                {pal.rarity}
-              </span>
             </div>
             
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
